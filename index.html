@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Bank Management System</title>
+    <style>
+        :root {
+            --primary-color: #d9534f;
+            --dark-color: #2c3e50;
+            --light-color: #f8f9fa;
+            --success-color: #2ecc71;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f7;
+            color: var(--dark-color);
+            padding-bottom: 40px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Inventory Grid Styling */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .blood-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .blood-card h3 {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .blood-card p {
+            font-size: 14px;
+            font-weight: bold;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        /* Main Workspace split */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .panel h2 {
+            margin-bottom: 20px;
+            font-size: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #c9302c;
+        }
+
+        /* Search and Filter Styling */
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+
+        .badge {
+            background-color: #ebccd1;
+            color: var(--primary-color);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🩸 Blood Bank Management System</h1>
+    </header>
+
+    <div class="container">
+        
+        <!-- Live Inventory Section -->
+        <h2 style="margin-bottom: 15px; font-size: 22px;">Current Blood Stock (Liters)</h2>
+        <div class="inventory-grid">
+            <div class="blood-card"><h3>A+</h3><p id="stock-A+">12 L</p></div>
+            <div class="blood-card"><h3>A-</h3><p id="stock-A-">4 L</p></div>
+            <div class="blood-card"><h3>B+</h3><p id="stock-B+">15 L</p></div>
+            <div class="blood-card"><h3>B-</h3><p id="stock-B-">3 L</p></div>
+            <div class="blood-card"><h3>O+</h3><p id="stock-O+">20 L</p></div>
+            <div class="blood-card"><h3>O-</h3><p id="stock-O-">8 L</p></div>
+            <div class="blood-card"><h3>AB+</h3><p id="stock-AB+">7 L</p></div>
+            <div class="blood-card"><h3>AB-</h3><p id="stock-AB-">2 L</p></div>
+        </div>
+
+        <div class="main-layout">
+            
+            <!-- Left Panel: Form Registration -->
+            <div class="panel">
+                <h2>Register New Donor</h2>
+                <form id="donorForm">
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" min="18" max="65" required placeholder="Min 18">
+                    </div>
+                    <div class="form-group">
+                        <label for="bloodGroup">Blood Group</label>
+                        <select id="bloodGroup" required>
+                            <option value="">-- Select Group --</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Quantity (Liters)</label>
+                        <input type="number" id="quantity" step="0.1" min="0.1" max="1.0" required placeholder="e.g. 0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" required placeholder="10-digit number">
+                    </div>
+                    <button type="submit">Add Donor & Update Stock</button>
+                </form>
+            </div>
+
+            <!-- Right Panel: Registered Directory & Filtering -->
+            <div class="panel">
+                <h2>Donor Directory</h2>
+                <div class="search-box">
+                    <select id="filterBloodGroup" onchange="filterDonors()">
+                        <option value="ALL">All Blood Groups</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                    </select>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Blood Group</th>
+                                <th>Qty (L)</th>
+                                <th>Contact</th>
+                            </tr>
+                        </thead>
+                        <tbody id="donorTableBody">
+                            <!-- Pre-seeded mock data for demonstration -->
+                            <tr data-bg="O+">
+                                <td>Alex Mercer</td>
+                                <td>29</td>
+                                <td><span class="badge">O+</span></td>
+                                <td>0.5</td>
+                                <td>555-0199</td>
+                            </tr>
+                            <tr data-bg="A+">
+                                <td>Jane Smith</td>
+                                <td>34</td>
+                                <td><span class="badge">A+</span></td>
+                                <td>0.5</td>
+                                <td>555-0143</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Track numerical levels of blood inventory
+        const bloodInventory = {
+            'A+': 12.0, 'A-': 4.0, 'B+': 15.0, 'B-': 3.0,
+            'O+': 20.0, 'O-': 8.0, 'AB+': 7.0, 'AB-': 2.0
+        };
+
+        // Form submission logical handler
+        document.getElementById('donorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Extract values
+            const name = document.getElementById('fullName').value;
+            const age = document.getElementById('age').value;
+            const bloodGroup = document.getElementById('bloodGroup').value;
+            const quantity = parseFloat(document.getElementById('quantity').value);
